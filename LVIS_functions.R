@@ -323,6 +323,49 @@ draw_circos<-function(VIS_list){
 	circos.clear();
 }
 
+draw_composition_stackbars<-function(u_VIS_merge_homer_annot,counts_IS_expts,pick_samples,pick_VIS){
+
+	if (missing(pick_VIS)){
+		aux<-prepare_venn_diagram_samples(counts_IS_expts,pick_samples);
+		common_VIS<-aux[[1]];
+		for (i in 1:length(aux)){
+  			common_VIS<-intersect(common_VIS,aux[[i]]);
+		}
+		pick_VIS<-common_VIS;
+	}
+	
+	X<-counts_IS_expts[,pick_samples];
+	Z<-sweep(X,2,colSums(X),`/`);
+	write.table(Z[pick_VIS,],file="tmp.txt");
+
+	data<-read.table('tmp.txt',header=TRUE);
+	rest<-t(data.frame(1-colSums(data)));
+	rownames(rest)<-"rest";
+	tmp<-u_VIS_merge_homer_annot[as.numeric(rownames(data)),];
+	rownames(data)<-paste0(rownames(tmp),':',tmp$Gene.Name);
+	data<-rbind(data,rest);
+
+	df<-melt(cbind(VIS=rownames(data),data));
+	df$VIS<-factor(df$VIS,levels=rownames(data));
+
+	library(scales)
+	n<-dim(data)[1];
+	color_p<-hue_pal()(n);
+	color_p[n]<-"grey";
+
+	p <- ggplot(df, aes(x = variable, y = value, fill = VIS)) + 
+  	geom_bar(stat = "identity") +
+  	ylab("Fraction") +
+  	theme(axis.text.x = element_text(angle = 45, hjust = 1),axis.text=element_text(size=12)) +
+  	scale_fill_manual(values=color_p) + scale_color_manual(values=color_p);
+
+  	res<-list();
+  	res[['ggplot_obj']]<-p;
+  	res[['pick_VIS_composition']]<-data;
+  	return(res);
+
+}
+
 
 # get_VIS_chr<-function(VIS1,chr){
 # 	iz<-which(VIS1$chr==chr);
