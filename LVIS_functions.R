@@ -280,10 +280,6 @@ prepare_venn_diagram_samples <- function(counts_IS_expts,pick_samples){
 }
 
 
-
-
-
-
 get_genomicDensity<-function(u_VIS_merge,win_size){
 	
 	tmp<-u_VIS_merge[,c(1,2,3,6)];
@@ -309,16 +305,36 @@ get_genomicDensity<-function(u_VIS_merge,win_size){
 	return(VIS_density);
 }
 
+#VIS1, 2 are bed files like VIS1_before$overall
+cor_genomicDensity <- function(VIS1,VIS2){
+
+	all_chr<-c(paste0('chr',as.character(1:22)),'chrX','chrY');
+	all_cc<-matrix(0,length(all_chr),1);
+	rownames(all_cc)<-all_chr;
+	colnames(all_cc)<-'correlation';
+	for (cc in all_chr){
+		iz1<-which(VIS1$chr==cc);
+		iz2<-which(VIS2$chr==cc);
+		iz<-intersect(iz1,iz2);
+		x<-VIS1$pct[iz];
+		y<-VIS2$pct[iz];
+		all_cc[cc,1]<-cor(x,y);
+	}
+	
+	return(all_cc);
+}
+
+
 #input a few bed files as a list. for each file, we have chr, start, end storing the VIS
 #row names not matter..
-draw_circos<-function(VIS_list){
+draw_circos<-function(VIS_list,win_size){
 	library(circlize);
 	gap<-c(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0);gap[24]<-5;
 	circos.par(gap.after=gap);
 	circos.initializeWithIdeogram();
 	n<-length(VIS_list);
 	for (i in 1:n){
-		circos.genomicDensity(VIS_list[[i]], col = c("#0000FF80"), track.height = 0.1,window.size=1e6,ylim.force = TRUE);
+		circos.genomicDensity(VIS_list[[i]], col = c("#0000FF80"), track.height = 0.1,window.size=win_size,ylim.force = FALSE);
 	}
 	circos.clear();
 }
@@ -367,11 +383,6 @@ draw_composition_stackbars<-function(u_VIS_merge_homer_annot,counts_IS_expts,pic
 }
 
 
-# get_VIS_chr<-function(VIS1,chr){
-# 	iz<-which(VIS1$chr==chr);
-# 	vec<-VIS1[iz,]$pct;
-# 	return(vec);
-# }
 
 # get_hotspots_thres<-function(P2_hot,nVIS){
 # 	window=1e5;
