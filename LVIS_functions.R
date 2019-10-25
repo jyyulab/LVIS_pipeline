@@ -63,9 +63,9 @@ get_samples_diversity_measures <- function(tmp){
 	sample_UC50<-which(cp>0.5)[1];
 	res<-list();
 	res[['sample_OCI']]<-sample_OCI;
-	res[['sample_entropy']]<-sample_entropy;
-	res[['sample_Chao']]<-sample_Chao;
-	res[['sample_UC50']]<-sample_UC50;
+	res[['sample_entropy']]<-sample_entropy;#disad is just on prob. not exactly the number of species
+	res[['sample_Chao']]<-sample_Chao;#give a estimate of total number
+	res[['sample_UC50']]<-sample_UC50;#how many species to cover half of abuadance
 	res[['sample_nVIS']]<-length(rr);
 
 	return(res);
@@ -291,9 +291,33 @@ generate_u_VIS_merge_samples_matrix <- function(X){
 prepare_venn_diagram_samples <- function(counts_IS_expts,pick_samples){
 	aux<-list();
 	for (i in 1:length(pick_samples)){
-		aux[[pick_samples[i]]]<-names(which(counts_IS_expts[,pick_samples[i]]>0));
+		aux[[pick_samples[i]]]<-rownames(all_r)[which(counts_IS_expts[,pick_samples[i]]>0)];
 	}
 	return(aux);
+}
+
+
+collect_IS_per_celltypes <- function(counts_IS_expts){
+	library(dplyr)
+	library(tidyr)
+	X<-colnames(counts_IS_expts)
+	X<-data.frame(X);
+	X<-X %>% separate(X,c("patients","type","time"),"_");
+	rownames(X)<-colnames(counts_IS_expts);
+	iz<-which(X$type=='CD3');
+	r<-rowSums(as.matrix(counts_IS_expts[,rownames(X)[iz]]));
+	all_r<-data.frame(CD3=r);
+	iz<-which(X$type=='CD56');
+	r<-rowSums(as.matrix(counts_IS_expts[,rownames(X)[iz]]));
+	all_r<-cbind(all_r,CD56=r);
+	iz<-which(X$type=='CD19');
+	r<-rowSums(as.matrix(counts_IS_expts[,rownames(X)[iz]]));
+	all_r<-cbind(all_r,CD19=r);
+	iz<-which(X$type=='CD14CD15');
+	r<-rowSums(as.matrix(counts_IS_expts[,rownames(X)[iz]]));
+	all_r<-cbind(all_r,CD14CD15=r);
+	#colnames(all_r)[1]<-'CD3';
+	return(all_r);
 }
 
 
@@ -399,10 +423,12 @@ draw_composition_stackbars<-function(u_VIS_merge_homer_annot,counts_IS_expts,pic
 
 }
 
-simplify_homer_annotation <- function(u_VIS_merge_homer_annot){
+simplify_homer_annotation <- function(u_VIS_merge_homer_annot,M){
 	print("load hg19 annotation");
-	load("/Volumes/yu3grp/IO_JY/yu3grp/LVXSCID/Chang_NatGen_2017/hg19.basic.annotation.update.Rdata");
-
+	if (missing(M)){
+		load("/Volumes/yu3grp/IO_JY/yu3grp/LVXSCID/Chang_NatGen_2017/hg19.basic.annotation.update.Rdata");
+	}
+	
 	x<-u_VIS_merge_homer_annot$Annotation;
 	x<-gsub("3' UTR","3_UTR",x);
 	x<-gsub("5' UTR","5_UTR",x);
@@ -419,14 +445,11 @@ get_geneFreq <- function(u_VIS_merge_homer_annot_modify){
 	return(geneFreq);
 }
 
-generate_GeneCloud <- function(geneFreq,freq_min,alpha=1,out_file){
+generate_GeneCloud <- function(geneFreq,top_n_gene,out_file){
 	library(tagcloud);
-	geneFreq<-geneFreq^alpha;
-	U<-geneFreq[which(geneFreq>=freq_min)]
-	tagcloud(names(U),U,col="blue");
-	dev.copy2pdf( file=out_file, out.type= "cairo" );
+	tagcloud(names(geneFreq),geneFreq,col="red",sel=1:top_n_gene,algorithm= "oval");
+	dev.copy2pdf(file=out_file, out.type= "cairo" );
 }
-
 
 run_fgsea_from_geneFreq<-function(geneFreq,m_list){
 
@@ -454,19 +477,18 @@ run_fgsea_from_geneFreq<-function(geneFreq,m_list){
   	return(fgseaRes);  
 }
 
-
-
-
-# get_hotspots_thres<-function(P2_hot,nVIS){
-# 	window=1e5;
-# 	genome_size=3e9;
-# 	n<-genome_size/window;
-# 	lambda<-nVIS/n;
-# 	expect_count=P2_hot$pct*window;
-# 	all_Pvalue<-1-ppois(expect_count,lambda);
-# 	P2_hot$P<-all_Pvalue;
-# 	return(P2_hot);
-# }
-
-
-
+get_hotspots_thres<-function(X,nVIS){
+	window=1e5;
+	genome_size=3e9;
+	n<-genome_size/window;
+	lambda<-nVIS/n;
+	expect_count=X$pct*window;
+	all_Pvalue<-1-ppois(expect_count,lambda);
+	X$P<-all_Pvalue;
+	X<-X[order(X$P),];
+	library(sgof)
+	res<-BH(X$P);
+	X$P.adjust<-res$Adjusted.pvalues;
+	rownames(X)<-paste0(X[,1],":",X[,2],"-",X[,3]);
+	return(X);
+}
