@@ -18,13 +18,7 @@ count_VIS_freq <- function(tmp){
 #use dataframe of all_collected_VIS as input
 get_top20_composition_and_nVIS_all_samples <- function(all_P1_collected_IS_rename){
 	print('remember to get rid of the VISs with spike');
-	all_expts<-unique(all_P1_collected_IS_rename$sample_ori);
-	top20_IS_freq_vs_expts<-matrix(0,21,length(all_expts));
-	colnames(top20_IS_freq_vs_expts)<-all_expts;
-	rownames(top20_IS_freq_vs_expts)<-c(1:20,'rest');
-	nVIS<-matrix(0,length(all_expts),1);
-	colnames(nVIS)<-'nVIS';
-	rownames(nVIS)<-all_expts;
+	
 	for (e in all_expts){
 		tmp<-all_P1_collected_IS_rename[which(all_P1_collected_IS_rename$sample_ori==e),];
 		nVIS[e,1]<-dim(tmp)[1];
@@ -304,19 +298,18 @@ collect_IS_per_celltypes <- function(counts_IS_expts){
 	X<-data.frame(X);
 	X<-X %>% separate(X,c("patients","type","time"),"_");
 	rownames(X)<-colnames(counts_IS_expts);
-	iz<-which(X$type=='CD3');
+	uT<-unique(X$type);
+	i<-1;
+	tt<-uT[i];
+	iz<-which(X$type==tt);
 	r<-rowSums(as.matrix(counts_IS_expts[,rownames(X)[iz]]));
-	all_r<-data.frame(CD3=r);
-	iz<-which(X$type=='CD56');
-	r<-rowSums(as.matrix(counts_IS_expts[,rownames(X)[iz]]));
-	all_r<-cbind(all_r,CD56=r);
-	iz<-which(X$type=='CD19');
-	r<-rowSums(as.matrix(counts_IS_expts[,rownames(X)[iz]]));
-	all_r<-cbind(all_r,CD19=r);
-	iz<-which(X$type=='CD14CD15');
-	r<-rowSums(as.matrix(counts_IS_expts[,rownames(X)[iz]]));
-	all_r<-cbind(all_r,CD14CD15=r);
-	#colnames(all_r)[1]<-'CD3';
+	all_r<-data.frame(r);
+	for (tt in uT[2:length(uT)]){
+		iz<-which(X$type==tt);
+		r<-rowSums(as.matrix(counts_IS_expts[,rownames(X)[iz]]));
+		all_r<-cbind(all_r,r);
+	}
+	colnames(all_r)<-uT;
 	return(all_r);
 }
 
@@ -375,7 +368,7 @@ draw_circos<-function(VIS_list,win_size){
 	circos.initializeWithIdeogram();
 	n<-length(VIS_list);
 	for (i in 1:n){
-		circos.genomicDensity(VIS_list[[i]], col = c("#0000FF80"), track.height = 0.1,window.size=win_size,ylim.force = FALSE);
+		circos.genomicDensity(VIS_list[[i]], col = c("#600000"), track.height = 0.1,window.size=win_size,ylim.force = FALSE);
 	}
 	circos.clear();
 }
@@ -473,7 +466,6 @@ run_fgsea_from_geneFreq<-function(geneFreq,m_list){
 
   	#fgseaRes<-fgseaRes[order(fgseaRes$ES,decreasing=TRUE),]
   	rownames(fgseaRes)<-fgseaRes$pathway;
-
   	return(fgseaRes);  
 }
 
