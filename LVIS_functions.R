@@ -285,7 +285,7 @@ generate_u_VIS_merge_samples_matrix <- function(X){
 prepare_venn_diagram_samples <- function(counts_IS_expts,pick_samples){
 	aux<-list();
 	for (i in 1:length(pick_samples)){
-		aux[[pick_samples[i]]]<-rownames(all_r)[which(counts_IS_expts[,pick_samples[i]]>0)];
+		aux[[pick_samples[i]]]<-rownames(counts_IS_expts)[which(counts_IS_expts[,pick_samples[i]]>0)];
 	}
 	return(aux);
 }
@@ -361,6 +361,8 @@ cor_genomicDensity <- function(VIS1,VIS2){
 
 #input a few bed files as a list. for each file, we have chr, start, end storing the VIS
 #row names not matter..
+#trace("circos.genomicDensity",edit=TRUE)
+#max:4e-5
 draw_circos<-function(VIS_list,win_size){
 	library(circlize);
 	gap<-c(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0);gap[24]<-5;
@@ -370,6 +372,17 @@ draw_circos<-function(VIS_list,win_size){
 	for (i in 1:n){
 		circos.genomicDensity(VIS_list[[i]], col = c("#600000"), track.height = 0.1,window.size=win_size,ylim.force = FALSE);
 	}
+	circos.clear();
+}
+
+#use for plotting the hotspots..
+draw_circos_rainfall<-function(VIS_list){
+	library(circlize);
+	gap<-c(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0);gap[24]<-5;
+	circos.par(gap.after=gap);
+	circos.initializeWithIdeogram();
+	circos.genoimcRainfall(VIS_list);
+	#circos.genomicDensity(VIS_list[[i]], col = c("#600000"), track.height = 0.1,window.size=win_size,ylim.force = FALSE);
 	circos.clear();
 }
 
