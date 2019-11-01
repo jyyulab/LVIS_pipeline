@@ -363,14 +363,19 @@ cor_genomicDensity <- function(VIS1,VIS2){
 #row names not matter..
 #trace("circos.genomicDensity",edit=TRUE)
 #max:4e-5
+#https://stackoverflow.com/questions/53600926/how-do-you-add-track-label-in-r-circlize
 draw_circos<-function(VIS_list,win_size){
 	library(circlize);
 	gap<-c(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0);gap[24]<-5;
 	circos.par(gap.after=gap);
 	circos.initializeWithIdeogram();
 	n<-length(VIS_list);
+	track_names<-names(VIS_list);
 	for (i in 1:n){
 		circos.genomicDensity(VIS_list[[i]], col = c("#600000"), track.height = 0.1,window.size=win_size,ylim.force = FALSE);
+		circos.text(sector.index="chr1",track.index = 2*i,get.cell.meta.data("cell.xlim")-mean(get.cell.meta.data("cell.xlim"))/2,
+            get.cell.meta.data("cell.ylim"), labels = track_names[i],facing = "clockwise", niceFacing = TRUE, adj = c(0,0),cex=0.5)
+
 	}
 	circos.clear();
 }
