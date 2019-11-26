@@ -18,7 +18,13 @@ count_VIS_freq <- function(tmp){
 #use dataframe of all_collected_VIS as input
 get_top20_composition_and_nVIS_all_samples <- function(all_P1_collected_IS_rename){
 	print('remember to get rid of the VISs with spike');
-	
+	all_expts<-unique(all_P1_collected_IS_rename$sample_ori);
+	nVIS<-matrix(0,length(all_expts),1);
+	top20_IS_freq_vs_expts<-matrix(0,21,length(all_expts));
+	colnames(top20_IS_freq_vs_expts)<-all_expts;
+	rownames(nVIS)<-all_expts;
+	colnames(nVIS)<-'nVIS';
+	rownames(top20_IS_freq_vs_expts)<-c(c(1:20),'rest');
 	for (e in all_expts){
 		tmp<-all_P1_collected_IS_rename[which(all_P1_collected_IS_rename$sample_ori==e),];
 		nVIS[e,1]<-dim(tmp)[1];
@@ -434,6 +440,17 @@ draw_composition_stackbars<-function(u_VIS_merge_homer_annot,counts_IS_expts,pic
 
 }
 
+rep.col<-function(x,n){
+   matrix(rep(x,each=n), ncol=n, byrow=TRUE)
+}
+
+# Get upper triangle of the correlation matrix
+get_upper_tri <- function(cormat){
+    cormat[lower.tri(cormat)]<- NA
+    return(cormat)
+}
+
+
 simplify_homer_annotation <- function(u_VIS_merge_homer_annot,M){
 	print("load hg19 annotation");
 	if (missing(M)){
@@ -487,13 +504,15 @@ run_fgsea_from_geneFreq<-function(geneFreq,m_list){
   	return(fgseaRes);  
 }
 
+
 get_hotspots_thres<-function(X,nVIS){
-	window=1e5;
-	genome_size=3e9;
+#X is the output from get_genomicDensity
+	window=X$end[1]-X$start[1]+1;
+	genome_size=3.235e9;
 	n<-genome_size/window;
 	lambda<-nVIS/n;
-	expect_count=X$pct*window;
-	all_Pvalue<-1-ppois(expect_count,lambda);
+	count=X$pct*window;
+	all_Pvalue<-1-ppois(count,lambda);
 	X$P<-all_Pvalue;
 	X<-X[order(X$P),];
 	library(sgof)
@@ -502,3 +521,19 @@ get_hotspots_thres<-function(X,nVIS){
 	rownames(X)<-paste0(X[,1],":",X[,2],"-",X[,3]);
 	return(X);
 }
+
+convert_bed_format<-function(P1_hotspots.sort){
+	library(dplyr)
+	library(tidyr)
+	df<-data.frame(P1_hotspots.sort);
+	colnames(df)<-'region';
+	df <- df %>% separate(region, c("chr", "tmp"),":")
+	df <- df %>% separate(tmp, c("start", "end"),"-")
+	return(df);
+}
+
+
+
+
+
+
