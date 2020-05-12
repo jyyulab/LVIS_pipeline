@@ -432,7 +432,7 @@ draw_composition_stackbars<-function(u_VIS_merge_homer_annot,counts_IS_expts,pic
 simplify_homer_annotation <- function(u_VIS_merge_homer_annot,M){
 	print("load hg19 annotation");
 	if (missing(M)){
-		load("/Volumes/yu3grp/IO_JY/yu3grp/LVXSCID/Chang_NatGen_2017/hg19.basic.annotation.update.Rdata");
+		load("./hg19.basic.annotation.update.Rdata");
 	}
 	
 	x<-u_VIS_merge_homer_annot$Annotation;
