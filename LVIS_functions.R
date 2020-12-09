@@ -315,7 +315,8 @@ collect_IS_per_celltypes <- function(counts_IS_expts){
 	X<-data.frame(X);
 	X<-X %>% separate(X,c("patients","type","time"),"_");
 	rownames(X)<-colnames(counts_IS_expts);
-	uT<-unique(X$type);
+	uT<-c('bulk','CD3','CD19','CD14CD15','CD56','CD34');
+	#unique(X$type);
 	i<-1;
 	tt<-uT[i];
 	iz<-which(X$type==tt);
@@ -375,24 +376,29 @@ cor_genomicDensity <- function(VIS1,VIS2){
 	return(all_cc);
 }
 
-
 #input a few bed files as a list. for each file, we have chr, start, end storing the VIS
 #row names not matter..
 #trace("circos.genomicDensity",edit=TRUE)
 #max:4e-5
 #https://stackoverflow.com/questions/53600926/how-do-you-add-track-label-in-r-circlize
-draw_circos<-function(VIS_list,win_size){
+draw_circos<-function(VIS_list,win_size,bed){
+
 	library(circlize);
+	#bed = generateRandomBed(nr = 50, fun = function(k) sample(letters, k, replace = TRUE))
 	gap<-c(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0);gap[24]<-5;
+
 	circos.par(gap.after=gap);
-	circos.initializeWithIdeogram();
+	circos.initializeWithIdeogram(plotType = NULL);
+	#circos.genomicLabels(bed, labels.column = 4, side = "outside", cex=0.5,
+    #	col = as.numeric(factor(bed[[1]])), line_col = as.numeric(factor(bed[[1]])))
+	circos.genomicIdeogram()
+
 	n<-length(VIS_list);
 	track_names<-names(VIS_list);
 	for (i in 1:n){
 		circos.genomicDensity(VIS_list[[i]], col = c("#600000"), track.height = 0.1,window.size=win_size,ylim.force = FALSE);
-		circos.text(sector.index="chr1",track.index = 2*i,get.cell.meta.data("cell.xlim")-mean(get.cell.meta.data("cell.xlim"))/2,
-            get.cell.meta.data("cell.ylim"), labels = track_names[i],facing = "clockwise", niceFacing = TRUE, adj = c(0,0),cex=0.5)
-
+		#circos.text(sector.index="chr1",track.index = 2*i,get.cell.meta.data("cell.xlim")-mean(get.cell.meta.data("cell.xlim"))/2,
+        #    get.cell.meta.data("cell.ylim"), labels = track_names[i],facing = "clockwise", niceFacing = TRUE, adj = c(0,0),cex=0.5)
 	}
 	circos.clear();
 }
@@ -459,6 +465,14 @@ rep.col<-function(x,n){
 get_upper_tri <- function(cormat){
     cormat[lower.tri(cormat)]<- NA
     return(cormat)
+}
+
+reorder_cormat <- function(cormat){
+	# Use correlation between variables as distance
+	dd <- as.dist((1-cormat)/2)
+	hc <- hclust(dd)
+	cormat <-cormat[hc$order, hc$order]
+	return(cormat);
 }
 
 
@@ -542,12 +556,17 @@ get_hotspots_thres<-function(X,nVIS){
 	count=X$pct*window;
 	all_Pvalue<-1-ppois(count,lambda);
 	X$P<-all_Pvalue;
+	X$P_Bonferroni<-X$P*dim(X)[1];
+	X$P_Bonferroni[X$P_Bonferroni>1]<-1;
 	X<-X[order(X$P),];
-	library(sgof)
+	library(sgof);
 	res<-BH(X$P);
 	X$P.adjust<-res$Adjusted.pvalues;
 	rownames(X)<-paste0(X[,1],":",X[,2],"-",X[,3]);
-	return(X);
+	library(bedr);
+	sort.regions <- bedr.sort.region(rownames(X));
+	Xout<-X[sort.regions,];
+	return(Xout);
 }
 
 convert_bed_format<-function(P1_hotspots.sort){
@@ -560,7 +579,96 @@ convert_bed_format<-function(P1_hotspots.sort){
 	return(df);
 }
 
+generate_cormat_heatmap<-function(cormat,orient){
 
+	library(reshape2)
+	cormat <- reorder_cormat(cormat);
+	upper_tri <- get_upper_tri(cormat)
+	# Melt the correlation matrix
+	melted_cormat <- melt(upper_tri, na.rm = TRUE)
+	melted_cormat$value2<-round(melted_cormat$value*100)/100;
+
+	if (orient=='upper'){
+		# Create a ggheatmap
+		ggheatmap <- ggplot(melted_cormat, aes(Var1, Var2, fill = value))+
+ 		geom_tile(color = "white")+
+ 		scale_fill_gradient2(low = "white", high = "red", mid = "orange", 
+   		midpoint = .7, limit = c(0.15,1), space = "Lab", 
+    		name="Pearson\nCorrelation") +
+  		theme_minimal()+ # minimal theme
+ 		theme(axis.text.x = element_text(angle = 45, vjust = 1, 
+    		size = 14, hjust = 1))+
+ 		coord_fixed()
+		# Print the heatmap
+		# print(ggheatmap)
+		ggheatmap<-ggheatmap + 
+		geom_text(aes(Var1, Var2, label = value2), color = "black", size = 5) +
+		theme(
+	  	axis.title.x = element_blank(),
+	  	axis.title.y = element_blank(),
+	  	panel.grid.major = element_blank(),
+	  	panel.border = element_blank(),
+	  	panel.background = element_blank(),
+	  	axis.ticks = element_blank(),
+	  	legend.justification = c(1, 0),
+	  	legend.position = c(0.8, 0.2),
+	  	legend.direction = "horizontal")+
+	  	guides(fill = guide_colorbar(barwidth = 7, barheight = 1,
+        	        title.position = "top", title.hjust = 0.5));
+	} else if (orient=='lower'){
+		ggheatmap <- ggplot(melted_cormat, aes(Var2, Var1, fill = value))+
+ 		geom_tile(color = "white")+
+ 		scale_fill_gradient2(low = "white", high = "red", mid = "orange", 
+   		midpoint = .7, limit = c(0.15,1), space = "Lab", 
+    		name="Pearson\nCorrelation") +
+  		theme_minimal()+ # minimal theme
+ 		theme(axis.text.x = element_text(angle = 45, vjust = 1, 
+    		size = 14, hjust = 1))+
+ 		coord_fixed()
+		# Print the heatmap
+		# print(ggheatmap)
+		ggheatmap<-ggheatmap + 
+		geom_text(aes(Var2, Var1, label = value2), color = "black", size = 5) +
+		theme(
+	  	axis.title.x = element_blank(),
+	  	axis.title.y = element_blank(),
+	  	panel.grid.major = element_blank(),
+	  	panel.border = element_blank(),
+	  	panel.background = element_blank(),
+	  	axis.ticks = element_blank(),
+	  	legend.justification = c(1, 0),
+	  	legend.position = c(0.6, 0.7),
+	  	legend.direction = "horizontal")+
+	  	guides(fill = guide_colorbar(barwidth = 7, barheight = 1,
+        	        title.position = "top", title.hjust = 0.5));
+	}
+
+	return(ggheatmap);
+}
+
+run_bedtools_closest<-function(overlap_hotspots,all_SE_bed){
+	aux1<-convert_bed_format(overlap_hotspots);
+	aux2<-convert_bed_format(all_SE_bed);
+	write.table(aux1,file='hotspots.bed',sep="\t",quote=FALSE,row.names=FALSE,col.names=FALSE);
+	write.table(aux2,file="SE.bed",sep="\t",quote=FALSE,row.names=FALSE,col.names=FALSE);
+	cmd<-paste0("bedtools closest -a hotspots.bed -b SE.bed > res_out");
+	system(cmd);
+	#bedtools closest -a vis.bed -b SE.bed > res_out
+	res<-read.table('res_out');
+	tmp<-paste0(res[,1],":",res[,2],"-",res[,3]);
+	d1<-abs(res[,2]-res[,5]);
+	d2<-abs(res[,2]-res[,6]);
+	d3<-abs(res[,3]-res[,5]);
+	d4<-abs(res[,3]-res[,6]);
+	out<-cbind(res,minD=pmin(d1,d2,d3,d4));
+	is.overlap <- in.region(tmp,all_SE_bed);
+	out[which(is.overlap),]$minD<-0;
+	#res<-cbind(res,overlap=is.overlap);
+	iz<-which(!duplicated(tmp));
+	out<-out[iz,];
+	rownames(out)<-paste0(out[,1],":",out[,2],"-",out[,3]);
+	return(out);
+}
 
 
 
