@@ -5,6 +5,7 @@
 ##Ususally, patients are analyzed separately.
 
 source("LVIS_functions.R");
+#load("hg19.basic.annotation.update.Rdata");
 
 load("/Volumes/yu3grp/IO_JY/yu3grp/LVXSCID/VIS_20190708/parsed_VIS/all_P1_collected_IS_rename.RData");
 dim(all_P1_collected_IS_rename)
@@ -31,6 +32,10 @@ dt1<-dt[which(dt$expt.patients=='P1'),];
 
 df1$expt.Celltype<-factor(df1$expt.Celltype,levels=c('CD3','CD19','CD56','CD14CD15','TNC'));
 df1$expt.time<-factor(df1$expt.time,levels=c('12wks','16wks','6mo','9mo','12mo','15mo','16mo','18mo','21mo','24mo','27mo','30mo'));
+
+dt1$expt.Celltype<-factor(dt$expt.Celltype,levels=c('CD3','CD19','CD56','CD14CD15','TNC'));
+dt1$expt.time<-factor(dt$expt.time,levels=c('12wks','16wks','6mo','9mo','12mo','18mo','24mo'));
+
 
 p1<-draw_pie_charts(df1,dt1);p1;
 ggsave("all_P1_samples_VIS_composition.pdf",plot = last_plot(), device = NULL, path = NULL,scale = 1, width = 10, height = 14, dpi = 300);
@@ -73,7 +78,9 @@ X<-X[iu,];
 counts_IS_expts<-generate_u_VIS_merge_samples_matrix(X);
 dim(counts_IS_expts)#10270    58
 
-save(all_P1_collected_IS_rename,counts_IS_expts,u_VIS_merge_homer_annot,u_VIS_merge,file="all_P1_source.Rdata");
+all_P1_collected_IS_clean<-all_P1_collected_IS_rename;
+
+save(all_P1_collected_IS_clean,counts_IS_expts,u_VIS_merge_homer_annot,u_VIS_merge,file="all_P1_source.Rdata");
 
 
 

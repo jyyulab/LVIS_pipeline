@@ -143,6 +143,7 @@ draw_pie_charts <- function(df,dt){
 	#ggsave("all_patients_last_samples_composition.pdf",plot = last_plot(), device = NULL, path = NULL,scale = 1, width = 10, height = 14, dpi = 300);
 }
 
+#this function is unnecessary. the use of scientific=FALSE in the format() function fix the problem. 
 validate_coordinates <- function(all_P5_collected_IS){
 	z1<-as.character(all_P5_collected_IS$start);
 	z2<-as.character(all_P5_collected_IS$end);
@@ -161,16 +162,15 @@ validate_coordinates <- function(all_P5_collected_IS){
 
 preprocess_all_VIS_collection<- function(all_P1_collected_IS){
 	#all_P1_collected_IS is the collection of output from the same patient
-	all_IS_P1<-paste0(all_P1_collected_IS$seqnames,'.',all_P1_collected_IS$start,'.',all_P1_collected_IS$end,'.',all_P1_collected_IS$strand);
-	all_IS_P1_aux<-paste0(all_P1_collected_IS$seqnames,':',all_P1_collected_IS$start,'-',all_P1_collected_IS$end);
+	all_IS_P1<-paste0(all_P1_collected_IS$seqnames,'.',format(all_P1_collected_IS$start,trim=TRUE,scientific=FALSE),'.',format(all_P1_collected_IS$end,trim=TRUE,scientific=FALSE),'.',all_P1_collected_IS$strand);
+	all_IS_P1_aux<-paste0(all_P1_collected_IS$seqnames,':',format(all_P1_collected_IS$start,trim=TRUE,scientific=FALSE),'-',format(all_P1_collected_IS$end,trim=TRUE,scientific=FALSE));
 	
 	#20152
 	u_all_IS_P1<-unique(all_IS_P1);
 	u_all_IS_P1<-read.table(text = u_all_IS_P1, sep = ".");
 	library(bedr);
 	x<-paste0(u_all_IS_P1[,1],":",u_all_IS_P1[,2],'-',u_all_IS_P1[,3]);
-	is.x.valid  <- is.valid.region(x);
-	#get rid of other chr
+	is.x.valid  <- is.valid.region(x); #get rid of other chr
 	x <- x[is.x.valid];
 	u_all_IS_P1<-u_all_IS_P1[is.x.valid,];
 	dim(u_all_IS_P1)
@@ -206,6 +206,9 @@ preprocess_all_VIS_collection<- function(all_P1_collected_IS){
 
 merge_all_preprocessed_VIS_collection <-function(u_all_IS_P1){
 	###we can merge adjacinet VIS..with d=8? d=4? d=0?
+	#currently, we use d=0 in avoid VIS sites getting too big
+	#the Lance pipeline tested for d=5,6,7,8 to merge in in the raw read level
+	#it is different from here..
 	u_all_IS_P1.merge<-bedr(
 		engine = "bedtools", 
      	input = list(i = u_all_IS_P1), 
@@ -214,6 +217,9 @@ merge_all_preprocessed_VIS_collection <-function(u_all_IS_P1){
         );
 
 	u_all_IS_P1.merge<-cbind(u_all_IS_P1.merge,eff_ind=c(1:dim(u_all_IS_P1.merge)[1]));
+	#note that column ind refer to how many sites in the input list that merged list covers
+	#aux stores the label those sites (indexed by row # in u_all_IS_P1. the aux information is then used to generate th
+	#output, u_VIS_merg and map
 
 	U<-u_all_IS_P1.merge$aux;
 	V<-u_all_IS_P1.merge$eff_ind;
@@ -236,14 +242,17 @@ merge_all_preprocessed_VIS_collection <-function(u_all_IS_P1){
 
 get_merged_ID_from_all_VIS_collection <- function(all_P1_collected_IS){
 	
+	#in the preprocess functions, a simple unique is performed and sites mapped to the non-canonical chr are removed
+	#the result is u_all_IS_P1, an additional column is added to the input frame, it maps every site in the input to the u_all_IS. NA will be used
+	#if the site cannot be mapped, because it is found in one of the non-canonical chr,
 	res1<-preprocess_all_VIS_collection(all_P1_collected_IS);
 	u_all_IS_P1<-res1[['u_all_IS_sort']];
 	all_P1_collected_IS_mapped<-res1[['all_collected_IS_mapped']];
 
-	#x<-all_IS_P1_collected_mapped$u_ind;
-	#x<-x[!is.na(x)];
-	#max(x)
 
+	#NB, essentially, all sites in the  overlapping unique sites were merged using bedtools. 
+	#u_VIS_merge stores the merged list, the mapping between the merged list and the input list is 
+	#defined in the array map
 	res2<-merge_all_preprocessed_VIS_collection(u_all_IS_P1);
 
 	u_VIS_merge<-res2$u_VIS_merge;
@@ -256,6 +265,8 @@ get_merged_ID_from_all_VIS_collection <- function(all_P1_collected_IS){
 	#the unique VIS index to the merged index..
 	#u_VIS_to_merged_VIS[iz,]
 
+	#after 2 steps mapping, the original list is mapped all_P1_collected_IS got a new merged id...listed in u_VIS_merge
+	#(shown in data.frame X);
 	X<-cbind(all_P1_collected_IS_mapped,u_merge_ind=u_VIS_to_merged_VIS[all_P1_collected_IS_mapped$u_ind,]$new_index);
 	#X[order(X$nReads,decreasing = TRUE),];
 
@@ -473,9 +484,26 @@ get_geneFreq <- function(u_VIS_merge_homer_annot_modify){
 	return(geneFreq);
 }
 
-generate_GeneCloud <- function(geneFreq,top_n_gene,out_file){
-	library(tagcloud);
-	tagcloud(names(geneFreq),geneFreq,col="red",sel=1:top_n_gene,algorithm= "oval");
+generate_GeneCloud <- function(geneFreq,out_file){
+	#library(tagcloud);
+	#let's just take the top genes cover 25% lof all VIS..
+	library(wordcloud)
+	set.seed(1234) # for reproducibility 
+	df <- data.frame(gene = names(geneFreq),freq=geneFreq);
+	df<-df[,c(1,3)];
+	colnames(df)<-c("gene","freq");
+	df$gene<-as.character(df$gene);
+	cf<-cumsum(df$freq)/sum(df$freq);
+	df2<-df[1:which(cf>.25)[1],];
+	top_n_gene<-dim(df2)[1];
+	minf<-df[top_n_gene,2]-1;
+	max_font<-df2[1,2]/sum(df$freq);
+	max_font<-round(max_font*500,1);
+	min_font<-df2[top_n_gene,2]/sum(df$freq);
+	min_font<-round(min_font*500,1);
+	dev.new(width=5, height=5, unit="in")
+	wordcloud(words = df2$gene, freq = df2$freq,min.freq=minf,max.words=top_n_gene, random.order=FALSE,rot.per=0,fixed.asp=TRUE,colors=brewer.pal(8, "Dark2"),scale=c(max_font,min_font))
+	#tagcloud(names(geneFreq),geneFreq,col="red",sel=1:top_n_gene,algorithm= "oval");
 	dev.copy2pdf(file=out_file, out.type= "cairo" );
 }
 
