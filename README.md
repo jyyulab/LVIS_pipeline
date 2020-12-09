@@ -1,7 +1,8 @@
 # LVIS_pipeline
-
 Processing the outputs of vector integration sites pipeline.
-![picture1](./img/track.png)
+
+<img src="./img/track.png" width="600" height="600">
+
 
 ## Download
 ```git clone https://github.com/jyyulab/LVIS_pipeline  # Clone the repo```
