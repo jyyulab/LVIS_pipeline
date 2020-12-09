@@ -9,8 +9,8 @@ Processing the outputs of vector integration sites pipeline.
 
 ## Prerequisites
 * [R >3.6.2]
-	* [bedr]
-* [bedtools]
+	* [bedr 1.0.7]
+* [bedtools 2.29.0]
 
 ## Installation
 ### LVIS_functions.R stores all the related functions
@@ -28,5 +28,7 @@ An example of input file:
 ![picture2](./img/sample_input.png)
 
 ### Outputs
-The pipeline.R script shows the the compilation of a final list of VISs. To reduce false-positive results, only insertion sites with at least two unique reads or at least five total reads were kept. The total number of reads mapped to a VIS was used to quantify the relative population of the corresponding clone. To compile a complete list of insertion sites for a patient, insertion sites across samples were matched. In short, overlapping insertion sites (defined from the start position to the end position in the VIS calling output) from different samples were considered to be the same site, even though the procedure might potentially merge a few insertion sites that were close to one another. Based on the compiled list, a frequency matrix storing the total number of reads mapped to each of the insertion sites across samples from different cell types and time points was constructed for quantifying clonal populations. The functions in LVIS_functions.R. can further be used for determining hotspots and quantifying clonal diversity.
+The pipeline.R script shows the the compilation of a final list of VISs. To reduce false-positive results, only insertion sites with at least two unique reads or at least five total reads were kept. The total number of reads mapped to a VIS was used to quantify the relative population of the corresponding clone. To compile a complete list of insertion sites for a patient, insertion sites across samples were matched. In short, overlapping insertion sites (defined from the start position to the end position in the VIS calling output) from different samples were considered to be the same site, even though the procedure might potentially merge a few insertion sites that were close to one another. Based on the compiled list, a frequency matrix storing the total number of reads mapped to each of the insertion sites across samples from different cell types and time points was constructed for quantifying clonal populations. 
+
+The functions in LVIS_functions.R. can further be used for determining hotspots and quantifying clonal diversity.
 
