@@ -299,6 +299,29 @@ generate_u_VIS_merge_samples_matrix <- function(X){
 
 }
 
+generate_u_VIS_merge_samples_matrix_unique <- function(X){
+	all_expts<-unique(X$sample_ori);
+	n<-max(X$u_merge_ind)
+	uID<-matrix(0,n,length(all_expts));
+	rownames(uID)<-c(1:n);
+	colnames(uID)<-all_expts;
+
+	for (e in all_expts){
+		iz<-which(X$sample_ori==e);
+		X2<-X[iz,];
+		utmp<-unique(X2$u_merge_ind);
+		vtmp<-c();
+		for (uu in utmp){
+			iuu<-which(X2$u_merge_ind==uu);
+			vtmp<-c(vtmp,sum(X2$nUniqueReads[iuu]));
+		}
+		uID[utmp,e]<-vtmp;
+	}
+	return(uID);
+
+}
+
+
 prepare_venn_diagram_samples <- function(counts_IS_expts,pick_samples){
 	aux<-list();
 	for (i in 1:length(pick_samples)){
