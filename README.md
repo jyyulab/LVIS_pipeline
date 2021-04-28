@@ -1,8 +1,8 @@
 # Identification of lentiviral integration sites and analysis
 <img src="./img/track.png" width="600" height="600">
 
-This repository includes a few analysis pipelines for lentiviral integrome analysis.
-  <summary>Table of Contents</summary>
+
+  <summary>This repository includes a few analysis pipelines for lentiviral integrome analysis.</summary>
   <ol>
     <li><a href="#Sequencing pipeline for our qsLAM PCR assay">Sequencing pipeline for our qsLAM PCR assay</a></li>
     <li><a href="#Steps for profiling integration sites from scATAC-seq and scMultiome data">Steps for profiling integration sites from scATAC-seq and scMultiome data</a></li>
