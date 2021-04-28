@@ -1,7 +1,11 @@
-# LVIS_pipeline
-Processing the outputs of vector integration sites pipeline.
-
+# Identification of lentiviral integration sites and analysis
+This repository includes a few analysis pipelines for lentiviral integrome analysis.
 <img src="./img/track.png" width="600" height="600">
+
+1. Sequencing pipeline for our qsLAM PCR assay
+2. [Steps for profiling integration sites from scATAC-seq and scMultiome data] (./steps_profile_VIS_scMultiome.md)
+3. Downstream analysis of vector integration sites
+4. A classifier of integration sites by integrome signatures
 
 
 ## Download
