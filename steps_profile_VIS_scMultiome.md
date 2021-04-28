@@ -5,6 +5,7 @@ Here are the steps for profiling VIS from 10X scATAC-seq/scMultiome data. The ma
 As prerequisites, files from multiple lanes should be merged. Qualtiy control was performed for R1 and R3 (fastqc), reads should be trimmed in case adapters are found. More important, build a bwa index for a modified human genome. The provirus sequence (see the file provirus_sequence) is appended as an additional chromosome.
 
 Step 1 (alignment)
+Map the reads to the modified genome by bwa.
 ```bash
 idx=/research/projects/yu3grp/IO_JY/yu3grp/LVXSCID/patients_scATACseq/bwa_index/hg19withpv/hg19wpvidx ##location of the bwa index
 input1=P1_scMulti_ATAC_S1_R1.fastq.gz
@@ -13,3 +14,5 @@ bam_file=P1_scMulti_ATAC_S1_pe.bam
 bwa mem -t 4 $idx $input1 $input2 | samtools view -bS - > $bam_file
 ```
 
+Step 2 (extract the chimeric reads)
+Extract the chimeric reads in which one end is mapped to a human chromosome, whereas another end is mapped to the provirus sequence. 
