@@ -31,3 +31,5 @@ samtools view -h $out1 | awk '($7 == "chrZ_provirus" && $3!="=") || ($3 == "chrZ
 samtools view -h $out1 | awk '($7 == "="  && $6 ~ /S/) || ($7 == "="  && $14 ~ /S/) || $1 ~ /^@/' | samtools view -bS - > $out1_filter2
 
 ```
+
+Step 3 (extract the cellular barcode for each chimeric read)
