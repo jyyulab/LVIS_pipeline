@@ -21,7 +21,7 @@ This repository includes a few analysis pipelines for lentiviral integrome analy
   * [bwa]
   * [R]
 
-See the steps-by-steps [instructions] (https://github.com/jyyulab/LVIS_pipeline/blob/master/steps_profile_VIS_scMultiome.md) for identifying integration sites from ATAC-seq data.
+See the steps-by-steps [instructions](https://github.com/jyyulab/LVIS_pipeline/blob/master/steps_profile_VIS_scMultiome.md) for identifying integration sites from ATAC-seq data.
 
 
 ## Downstream analysis of vector integration sites
