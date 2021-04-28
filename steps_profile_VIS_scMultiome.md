@@ -16,3 +16,18 @@ bwa mem -t 4 $idx $input1 $input2 | samtools view -bS - > $bam_file
 
 Step 2 (extract the chimeric reads)
 Extract the chimeric reads in which one end is mapped to a human chromosome, whereas another end is mapped to the provirus sequence. 
+```bash
+input=P1_scMulti_ATAC_S1_pe.bam
+out=P1_scMulti_ATAC_S1_pe_mated.bam
+out_filter1=P1_scMulti_ATAC_S1_pe.mated.filter1.bam
+out_filter2=P1_scMulti_ATAC_S1_pe.mated.filter2.bam
+
+samtools view -F 12 $input1 -o $out1
+
+###It will get all host-virus pairs
+samtools view -h $out1 | awk '($7 == "chrZ_provirus" && $3!="=") || ($3 == "chrZ_provirus" && $7!="=") || $1 ~ /^@/' | samtools view -bS - > $out1_filter1
+
+###get the host-host, virus-virus pairs with soft clip
+samtools view -h $out1 | awk '($7 == "="  && $6 ~ /S/) || ($7 == "="  && $14 ~ /S/) || $1 ~ /^@/' | samtools view -bS - > $out1_filter2
+
+```
