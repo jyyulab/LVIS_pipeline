@@ -16,6 +16,9 @@ This repository includes a few analysis pipelines for lentiviral integrome analy
 
 ## Steps for profiling integration sites from scATAC-seq and scMultiome data
 
+See the [steps](https://github.com/othneildrew/Best-README-Template/issues) for identifying integration sites from ATAC-seq data.
+
+
 ## Downstream analysis of vector integration sites
 
 ## A classifier of integration sites by integrome signatures
