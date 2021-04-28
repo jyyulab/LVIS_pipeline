@@ -17,9 +17,9 @@ This repository includes a few analysis pipelines for lentiviral integrome analy
 ## Steps for profiling integration sites from scATAC-seq and scMultiome data
 
 ### Prerequisites
-  * [samtools]
-  * [bwa]
-  * [R]
+  * [fastqc >0.11.5
+  * [samtools >1.10]
+  * [bwa >0.7.17]
 
 See the steps-by-steps [instructions](https://github.com/jyyulab/LVIS_pipeline/blob/master/steps_profile_VIS_scMultiome.md) for identifying integration sites from ATAC-seq data.
 
