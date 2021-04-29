@@ -21,6 +21,7 @@ input=P1_scMulti_ATAC_S1_pe.bam
 out=P1_scMulti_ATAC_S1_pe_mated.bam
 out_filter1=P1_scMulti_ATAC_S1_pe.mated.filter1.bam
 out_filter2=P1_scMulti_ATAC_S1_pe.mated.filter2.bam
+out_filter=P1_scMulti_ATAC_S1_pe.mated.filter.bam
 
 samtools view -F 12 $input1 -o $out1
 
@@ -29,6 +30,8 @@ samtools view -h $out1 | awk '($7 == "chrZ_provirus" && $3!="=") || ($3 == "chrZ
 
 ###get the host-host, virus-virus pairs with soft clip
 samtools view -h $out1 | awk '($7 == "="  && $6 ~ /S/) || ($7 == "="  && $14 ~ /S/) || $1 ~ /^@/' | samtools view -bS - > $out1_filter2
+
+samtools merge $out_filter $out_filter1 $out_filter2
 
 ```
 
