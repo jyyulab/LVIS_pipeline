@@ -32,4 +32,5 @@ samtools view -h $out1 | awk '($7 == "="  && $6 ~ /S/) || ($7 == "="  && $14 ~ /
 
 ```
 
-Step 3 (extract the cellular barcode for each chimeric read)
+Step 3 (Matching cellular barcodes) 
+Extract the cellular barcode for each chimeric read using the R2 fastq file. The barcode is added as an additional tag in the bam file.
