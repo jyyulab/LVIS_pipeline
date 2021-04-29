@@ -37,3 +37,24 @@ samtools merge $out_filter $out_filter1 $out_filter2
 
 Step 3 (Matching cellular barcodes) 
 Extract the cellular barcode for each chimeric read using the R2 fastq file. The barcode is added as an additional tag in the bam file.
+
+```bash
+##input files
+input_bam=P1_scMulti_ATAC_S1_pe.mated.filter.bam. #bam file from step 2 storing chimeric reads
+cellID_file=P1_scMulti_ATAC_S1_R2.fastq.gz.       #R2 files storing all cellular barcodes from 10X   
+
+##name output files 
+input_bam_R2=P1_scMulti_ATAC_S1_pe.mated.filter_R2.fastq
+output_python_sam=P1_scMulti_ATAC_S1_pe.mated.filter_wCB.sam
+aux_file=aux
+
+#keep barcodes in R2 that present in the chimeric reads
+samtools view $input_bam | awk -F "\t" '{print $1}' > $aux_file
+seqtk subseq $cellID_file $aux_file > $input_bam_R2
+rm $aux_file
+
+```
+
+```bash
+samtools view -bS $output_python_sam > P6_scMulti_ATAC_S2_pe.mated.filter_wCB.bam
+```
