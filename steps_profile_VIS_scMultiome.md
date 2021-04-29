@@ -45,7 +45,6 @@ cellID_file=P1_scMulti_ATAC_S1_R2.fastq.gz.       #R2 files storing all cellular
 
 ##name output files 
 input_bam_R2=P1_scMulti_ATAC_S1_pe.mated.filter_R2.fastq
-output_python_sam=P1_scMulti_ATAC_S1_pe.mated.filter_wCB.sam
 aux_file=aux
 
 #keep barcodes in R2 that present in the chimeric reads
@@ -54,7 +53,9 @@ seqtk subseq $cellID_file $aux_file > $input_bam_R2
 rm $aux_file
 
 ```
+Now, we have a fastq file storing the R2 (cellular barcodes) for every chimeric read in the filtered bam file. Next, run this python script to add the corresponding barcode for each read in the bam file under the tar "CB". 
+
 
 ```bash
-samtools view -bS $output_python_sam > P6_scMulti_ATAC_S2_pe.mated.filter_wCB.bam
+samtools view -bS P1_scMulti_ATAC_S1_pe.mated.filter_wCB.sam > P6_scMulti_ATAC_S2_pe.mated.filter_wCB.bam
 ```
