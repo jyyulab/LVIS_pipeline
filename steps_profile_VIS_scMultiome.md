@@ -53,8 +53,7 @@ seqtk subseq $cellID_file $aux_file > $input_bam_R2
 rm $aux_file
 
 ```
-Now, we have a fastq file storing the R2 (cellular barcodes) for every chimeric read in the filtered bam file. Next, run this python script to add the corresponding barcode for each read in the bam file under the tar "CB". 
-
+Now, we have a fastq file storing the R2 (cellular barcodes) for every chimeric read in the filtered bam file. Next, run this python script to add the corresponding barcode for each read in the bam file under the tar "CB", and convert the file back to bam.
 
 ```bash
 samtools view -bS P1_scMulti_ATAC_S1_pe.mated.filter_wCB.sam > P6_scMulti_ATAC_S2_pe.mated.filter_wCB.bam
