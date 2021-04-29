@@ -35,7 +35,7 @@ samtools merge $out_filter $out_filter1 $out_filter2
 
 ```
 
-Step 3 (Matching cellular barcodes) 
+Step 3 (Match cellular barcodes) 
 Extract the cellular barcode for each chimeric read using the R2 fastq file. The barcode is added as an additional tag in the bam file.
 
 ```bash
@@ -56,5 +56,9 @@ rm $aux_file
 Now, we have a fastq file storing the R2 (cellular barcodes) for every chimeric read in the filtered bam file. Next, run this python script to add the corresponding barcode for each read in the bam file under the tar "CB", and convert the file back to bam.
 
 ```bash
-samtools view -bS P1_scMulti_ATAC_S1_pe.mated.filter_wCB.sam > P6_scMulti_ATAC_S2_pe.mated.filter_wCB.bam
+samtools view -bS P1_scMulti_ATAC_S1_pe.mated.filter_wCB.sam > P1_scMulti_ATAC_S2_pe.mated.filter_wCB.bam
 ```
+
+Step 4 (Run EpiVIA)
+
+
