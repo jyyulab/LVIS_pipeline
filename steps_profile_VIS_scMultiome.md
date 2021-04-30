@@ -53,12 +53,28 @@ seqtk subseq $cellID_file $aux_file > $input_bam_R2
 rm $aux_file
 
 ```
-Now, we have a fastq file storing the R2 (cellular barcodes) for every chimeric read in the filtered bam file. Next, run this python script to add the corresponding barcode for each read in the bam file under the tar "CB", and convert the file back to bam.
+Now, we have a fastq file storing the R2 (cellular barcodes) for every potential chimeric read in the filtered bam file. Next, run this python script to add the corresponding barcode for each read in the bam file under the tar "CB", and convert the file back to bam.
 
 ```bash
 samtools view -bS P1_scMulti_ATAC_S1_pe.mated.filter_wCB.sam > P1_scMulti_ATAC_S2_pe.mated.filter_wCB.bam
 ```
 
 Step 4 (Run EpiVIA)
+Install the tool [EpiVIA](https://github.com/wangwl/epiVIA). The basic input is the bam file storing potential chimeric reads with CB as tag. In addition, the locations of the provirus sequence and bwa index have to be provided. Inside the provirus sequence, the coordinates of the viral long-term repeat (LTR) should be provided.
+
+```bash
+input_bam=P1_scMulti_ATAC_S1_pe.mated.filter_wCB.bam
+provirus_file=/research/projects/yu3grp/IO_JY/yu3grp/LVXSCID/patients_scATACseq/provirus_sequence
+out_dir=/research/projects/yu3grp/IO_JY/yu3grp/LVXSCID/patients_scATACseq/multiome_P1/05_epiVIA_res_v3
+
+out_bam=$out_dir/P1_scMulti_ATAC_S1_out.wCB.bam #output bam file
+out_bam_aux=$out_dir/P1_scMulti_ATAC_S1_out #folder storing the output bam file
+mkdir $out_bam_aux
+
+epiVIA --Provirus $provirus_file --ltr5_start 1 --ltr5_end 650 --ltr3_start 3991 --ltr3_end 4640 --HostIndex /research/projects/yu3grp/IO_JY/yu3grp/LVXSCID/patients_scATACseq/bwa_index/hg19/hg19idx --Host2bit /research/projects/yu3grp/IO_JY/yu3grp/LVXSCID/patients_scATACseq/hg19.2bit --tempdir $out_bam_aux --candidate_bam $out_bam --gbdb http://hgdownload.soe.ucsc.edu/gbdb/ --genome hg19 $input_bam $out_bam_aux
+```
+
+
+
 
 
