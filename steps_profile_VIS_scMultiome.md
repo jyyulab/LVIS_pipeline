@@ -74,7 +74,7 @@ mkdir $out_bam_aux
 epiVIA --Provirus $provirus_file --ltr5_start 1 --ltr5_end 650 --ltr3_start 3991 --ltr3_end 4640 --HostIndex /research/projects/yu3grp/IO_JY/yu3grp/LVXSCID/patients_scATACseq/bwa_index/hg19/hg19idx --Host2bit /research/projects/yu3grp/IO_JY/yu3grp/LVXSCID/patients_scATACseq/hg19.2bit --tempdir $out_bam_aux --candidate_bam $out_bam --gbdb http://hgdownload.soe.ucsc.edu/gbdb/ --genome hg19 $input_bam $out_bam_aux
 ```
 
-
+The output file "integration_sites.txt" compiles a list of integration sites with the corresponding barcodes. By loading scATAC-seq or scMultiome data into count matrices using tools like Seurat, the barcodes can be used to access the expression and accessibility of the cell.
 
 
 
