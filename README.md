@@ -15,12 +15,12 @@ This repository includes a few analysis pipelines for lentiviral integrome analy
 ## Sequencing pipeline for our qsLAM PCR assay
 
 ### Dependencies
-  * [fastqc >0.11.5
-  * [cutadapt
-  * [samtools >1.10
-  * [bwa >0.7.17
-  * [bedtools
-  * [R
+  * [fastqc >0.11.5]
+  * [cutadapt]
+  * [samtools >1.10]
+  * [bwa >0.7.17]
+  * [bedtools >2.29.0]
+  * [R >3.6.2]
 
 ### Usage
 See the steps-by-steps [instructions](https://github.com/jyyulab/LVIS_pipeline/blob/master/steps_for_qsLAM_PCR_pipeline.md).
