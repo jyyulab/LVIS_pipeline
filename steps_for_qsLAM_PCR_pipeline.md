@@ -5,17 +5,6 @@
 The pipeline consists of a number shell scripts usable in Linux.  Some of these scrips will be system dependent.
 There are a number of software dependencies.  Some of the scripts contain module load commands to load environmental variables.  This may need to be changed for a particular system.
 
-
-### Dependencies
-
-1. fastqc
-2. cutadapt
-3. bwa
-4. bedtools
-5. samtools
-6. R
-
-
 ### Steps within pipeline
 
 1. 01-fastqc.sh
