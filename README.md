@@ -23,7 +23,7 @@ This repository includes a few analysis pipelines for lentiviral integrome analy
   * [R >3.6.2]
 
 ### Usage
-See the steps-by-steps [instructions](https://github.com/jyyulab/LVIS_pipeline/blob/master/steps_for_qsLAM_PCR_pipeline.md).
+Download everything inside the folder qsLAM into the working directory. Create a folder called rawdata and put the paired-end reads files inside. Follow the steps-by-steps [instructions](https://github.com/jyyulab/LVIS_pipeline/blob/master/steps_for_qsLAM_PCR_pipeline.md).
 
 ## Steps for profiling integration sites from scATAC-seq and scMultiome data
 
