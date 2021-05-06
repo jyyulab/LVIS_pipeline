@@ -14,6 +14,9 @@ This repository includes a few analysis pipelines for lentiviral integrome analy
 
 ## Sequencing pipeline for our qsLAM PCR assay
 
+### Usage
+See the steps-by-steps [instructions](https://github.com/jyyulab/LVIS_pipeline/blob/master/steps_for_qsLAM_PCR_pipeline.md).
+
 ## Steps for profiling integration sites from scATAC-seq and scMultiome data
 
 ### Prerequisites
