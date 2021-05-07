@@ -19,7 +19,7 @@ This repository includes a few analysis pipelines for lentiviral integrome analy
   * [cutadapt]
   * [samtools >1.10]
   * [bwa >0.7.17]
-  * [bedtools >2.29.0]
+  * [bedtools >2.25.0]
   * [R >3.6.2]
 
 ### Usage
