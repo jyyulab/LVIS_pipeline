@@ -6,7 +6,7 @@
 #BSUB -R "rusage[mem=8000]"     # memory to reserve, in MB
 #BSUB -e errors.%J.hybrid     # error file name in which %J is replaced by the job ID
 #BSUB -o output.%J.hybrid     # output file name in which %J is replaced by the job ID
-
+module load R/3.4.0
 
 for i in `ls newFastq | grep -P "fastq$"`
 do
