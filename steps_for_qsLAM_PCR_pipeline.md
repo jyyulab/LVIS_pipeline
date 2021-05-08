@@ -1,36 +1,9 @@
 # Calling vector integration sites from qsLAM PCR assay
 
+Download everything in the folder qsLAM_PCR into the working directory. The pipeline consists of a number shell scripts usable in Linux. Some of the scripts contain module load commands to load environmental variables.  This may need to be changed for a particular system. Create a folder named rawdata in the working directory for the input files. The input files are paired-end reads sequenced from the qsLAM-PCR assay. A optional step using [FASTQC](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/) for quality control can be performed using [01-fastqc.sh](https://github.com/jyyulab/LVIS_pipeline/blob/master/qsLAM_PCR/01-fastqc.sh).
 
-##  Overview
-The pipeline consists of a number shell scripts usable in Linux.  Some of these scrips will be system dependent.
-There are a number of software dependencies.  Some of the scripts contain module load commands to load environmental variables.  This may need to be changed for a particular system.
+Step 1 (Reads preprocessing) Primer sequences are trimmed using [cutadapt](https://cutadapt.readthedocs.io/en/stable/). For forward reads this is ATCCCTCAGACCCTTTTAGTCAGTGTGGAAAATCTC and for the reverse the sequence is GACTGCGTATCAGT. A maximum error rate of 0.1 is allowed. This is performed using [02-cutadapt.sh](https://github.com/jyyulab/LVIS_pipeline/blob/master/qsLAM_PCR/02-cutadapt.sh). Reads whose length are less than 30 bp after trimming are further filtered [05-makeNewFastq.sh](https://github.com/jyyulab/LVIS_pipeline/blob/master/qsLAM_PCR/05-makeNewFastq.sh), resulting at new fastq files for mapping. 
 
-### Steps within pipeline
-
-1. 01-fastqc.sh
-2. 02-cutadapt.sh
-3. 05-makeNewFastq.sh
-4. 10-bwa.sh
-5. 11-bam2bed.sh
-6. 12-bed2wig.sh
-7. 13-bed2peak.noFilter.sh
-
-
-## Individual Steps
-
-### 01-fastqc.sh
-
-
-FASTQC is run for quality control.  This step is not necessary for further analysis.
-The FASTQC program is required to be installed. (https://www.bioinformatics.babraham.ac.uk/projects/fastqc/);.  Results are placed in the FASTQC directory.
-
-### 02.cutadapt.sh
-
-This script runs the cutadapt program (https://cutadapt.readthedocs.io/en/stable/)  to identify and remove primer sequences.  For forward reads this is ATCCCTCAGACCCTTTTAGTCAGTGTGGAAAATCTC and for the reverse the sequence is GACTGCGTATCAGT. A maximum error rate of 0.1 is allowed. Results are placed in the cutPrimer directory.
-
-### 05.makeNewFastq.sh
-
-This program create new sets of paired FASTQ files.  It uses the myjoin program (supoplied in this repository) to combine paired reads, before splitting them into separate files.  Resulting reads need to be > 30 bases after primer trimming.  Results are placed in the newFastq directory.
 
 ### 10.bwa.sh
 
