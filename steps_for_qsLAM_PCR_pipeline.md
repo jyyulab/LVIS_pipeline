@@ -2,12 +2,11 @@
 
 Download everything in the folder qsLAM_PCR into the working directory. The pipeline consists of a number shell scripts usable in Linux. Some of the scripts contain module load commands to load environmental variables.  This may need to be changed for a particular system. Create a folder named rawdata in the working directory for the input files. The input files are paired-end reads sequenced from the qsLAM-PCR assay. A optional step using [FASTQC](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/) for quality control can be performed using [01-fastqc.sh](https://github.com/jyyulab/LVIS_pipeline/blob/master/qsLAM_PCR/01-fastqc.sh).
 
-Step 1 (Reads preprocessing) Primer sequences are trimmed using [cutadapt](https://cutadapt.readthedocs.io/en/stable/). For forward reads this is ATCCCTCAGACCCTTTTAGTCAGTGTGGAAAATCTC and for the reverse the sequence is GACTGCGTATCAGT. A maximum error rate of 0.1 is allowed. This is performed using [02-cutadapt.sh](https://github.com/jyyulab/LVIS_pipeline/blob/master/qsLAM_PCR/02-cutadapt.sh). Reads whose length are less than 30 bp after trimming are further filtered [05-makeNewFastq.sh](https://github.com/jyyulab/LVIS_pipeline/blob/master/qsLAM_PCR/05-makeNewFastq.sh), resulting at new fastq files for mapping. 
+Step 1 (Reads preprocessing) Primer sequences are trimmed using [cutadapt](https://cutadapt.readthedocs.io/en/stable/). For forward reads this is ATCCCTCAGACCCTTTTAGTCAGTGTGGAAAATCTC (3' end of LTR) and for the reverse the sequence is GACTGCGTATCAGT (PCR adaptor). A maximum error rate of 0.1 is allowed. This is performed using [02-cutadapt.sh](https://github.com/jyyulab/LVIS_pipeline/blob/master/qsLAM_PCR/02-cutadapt.sh). Reads whose length are less than 30 bp after trimming are further filtered [05-makeNewFastq.sh](https://github.com/jyyulab/LVIS_pipeline/blob/master/qsLAM_PCR/05-makeNewFastq.sh), resulting at new fastq files for mapping. An optional script [06-readLen.sh](https://github.com/jyyulab/LVIS_pipeline/blob/master/qsLAM_PCR/06-readLen.sh) can be used to examine the read length.
+
+Step 2 (Reads alignment) Trimmed reads are aligned to the reference genome using the script [10-bwa.sh](https://github.com/jyyulab/LVIS_pipeline/blob/master/qsLAM_PCR/10-bwa.sh) by [BWA](http://bio-bwa.sourceforge.net/).  
 
 
-### 10.bwa.sh
-
-Bwa (http://bio-bwa.sourceforge.net/) is used to align reads in the newFastq directory to the hg19 human genome.  Results are placed in the bwa directory.
 
 ### 11.bam2bed.sh
 
