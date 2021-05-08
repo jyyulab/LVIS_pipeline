@@ -8,6 +8,9 @@ Primer sequences are trimmed using [cutadapt](https://cutadapt.readthedocs.io/en
 ### Step 2 (Reads alignment) 
 Trimmed reads are aligned to the reference genome using the script [10-bwa.sh](https://github.com/jyyulab/LVIS_pipeline/blob/master/qsLAM_PCR/10-bwa.sh) by [BWA](http://bio-bwa.sourceforge.net/).  
 
+### Step 3 (Post-mapping processing)
+The script [11-bam2bed.sh] (https://github.com/jyyulab/LVIS_pipeline/blob/master/qsLAM_PCR/11-bam2bed.sh) is used for filtering singleton reads, paris mapped on different chromosomes, pairs with insertion size >1000bp, as well as duplicated reads.
+
 
 
 ### 11.bam2bed.sh
