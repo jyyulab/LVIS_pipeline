@@ -9,11 +9,11 @@ Primer sequences are trimmed using [cutadapt](https://cutadapt.readthedocs.io/en
 Trimmed reads are aligned to the reference genome using the script [10-bwa.sh](https://github.com/jyyulab/LVIS_pipeline/blob/master/qsLAM_PCR/10-bwa.sh) by [BWA](http://bio-bwa.sourceforge.net/).  
 
 ### Step 3 (Post-mapping processing)
-The script [11-bam2bed.sh](https://github.com/jyyulab/LVIS_pipeline/blob/master/qsLAM_PCR/11-bam2bed.sh) is used for filtering singleton reads, pairs mapped on different chromosomes, pairs with insertion size >1000bp using bedtools [bamtobed](https://bedtools.readthedocs.io/en/latest/content/tools/bamtobed.html). The reads (and genomic coordinates) are stored in bed files, including one for only non-duplicated reads. An optional script [12-bed2wig.sh](https://github.com/jyyulab/LVIS_pipeline/blob/master/qsLAM_PCR/12-bed2wig.sh) can be used to convert the bed file to bedgraph and bigwig files.
+The script [11-bam2bed.sh](https://github.com/jyyulab/LVIS_pipeline/blob/master/qsLAM_PCR/11-bam2bed.sh) is used for filtering singleton reads, pairs mapped on different chromosomes, pairs with insertion size >1000bp using bedtools [bamtobed](https://bedtools.readthedocs.io/en/latest/content/tools/bamtobed.html). The reads (and genomic coordinates) are stored in bed files, including one for all reads and one for reads with duplicates (same start and end locations) removed. An optional script [12-bed2wig.sh](https://github.com/jyyulab/LVIS_pipeline/blob/master/qsLAM_PCR/12-bed2wig.sh) can be used to convert the bed file to bedgraph and bigwig files.
 
 ### Step 4 (Integration sites calling)
-13-bed2peak.noFilter.sh
-The final step uses the bed files to find the location of viral integration site and generates a  report.  An window size parameter d (used as $d) is a window size to merge ends of reads.
+The genomic starting coordinate of a read corresponds to the location of a vector integration site. Due to a resolution limit of the assay, two vector integration sites very close together are considered to be identical. This procedure is carried out by bedtools with an window size parameter d, using the script [13-bed2peak.noFilter.sh](https://github.com/jyyulab/LVIS_pipeline/blob/master/qsLAM_PCR/13-bed2peak.noFilter.sh). 
+
 
     awk -F "\t" '{if($6=="+"){print $1"\t"$2"\t"$6} else {print $1"\t"$3"\t"$6}}' bam2bed/${out_prefix}.bed | 
     grep -v vector |
