@@ -9,27 +9,11 @@ Primer sequences are trimmed using [cutadapt](https://cutadapt.readthedocs.io/en
 Trimmed reads are aligned to the reference genome using the script [10-bwa.sh](https://github.com/jyyulab/LVIS_pipeline/blob/master/qsLAM_PCR/10-bwa.sh) by [BWA](http://bio-bwa.sourceforge.net/).  
 
 ### Step 3 (Post-mapping processing)
-The script [11-bam2bed.sh](https://github.com/jyyulab/LVIS_pipeline/blob/master/qsLAM_PCR/11-bam2bed.sh) is used for filtering singleton reads, pairs mapped on different chromosomes, pairs with insertion size >1000bp, as well as duplicated reads. The output is a bed file storing the locations of the filtered reads. An optional script [12-bed2wig.sh](https://github.com/jyyulab/LVIS_pipeline/blob/master/qsLAM_PCR/12-bed2wig.sh) can be used to convert the bed file to bedgraph and bigwig files.
+The script [11-bam2bed.sh](https://github.com/jyyulab/LVIS_pipeline/blob/master/qsLAM_PCR/11-bam2bed.sh) is used for filtering singleton reads, pairs mapped on different chromosomes, pairs with insertion size >1000bp using bedtools [bamtobed](https://bedtools.readthedocs.io/en/latest/content/tools/bamtobed.html). The reads (and genomic coordinates) are stored in bed files, including one for only non-duplicated reads. An optional script [12-bed2wig.sh](https://github.com/jyyulab/LVIS_pipeline/blob/master/qsLAM_PCR/12-bed2wig.sh) can be used to convert the bed file to bedgraph and bigwig files.
 
-
-
-Samtools (http://www.htslib.org/) is used to view and sort bam files produced in the bwa directory into sam files.  (Soft and hard clipped reads are...?)  .  The bedtools bamtobed (https://bedtools.readthedocs.io/en/latest/content/tools/bamtobed.html) program is used with the  -bedpe and -mate1 options to convert the  sam files into bed files.
-(????? more steps I dont understand)
-
-    samtools view -H bwa/$i > bam2bed/${out_prefix}.sam
-	#samtools view  -F 4 -q 1 bwa/$i | perl -ne '$line=$_; @rec=split("\t",$line); $rec[5]=~ s/[SH].*//; if( !($rec[5] =~ /^[0-9]+$/ && $rec[5] > 6)){print $line;}' >> bam2bed/${out_prefix}.sam
-	samtools view  -F 4  bwa/$i | perl -ne '$line=$_; @rec=split("\t",$line); $rec[5]=~ s/[SH].*//; if( !($rec[5] =~ /^[0-9]+$/ && $rec[5] > 6)){print $line;}' >> bam2bed/${out_prefix}.sam
-	samtools sort -n <(samtools view -hbS bam2bed/${out_prefix}.sam ) bam2bed/${out_prefix}
-	bedtools bamtobed -i bam2bed/${out_prefix}.bam -bedpe -mate1 > bam2bed/${out_prefix}.temp
-	cat bam2bed/${out_prefix}.temp | perl -e 'while(<STDIN>){$line=$_; @rec=split("\t", $line); if($rec[0] eq $rec[3]){ $start = ($rec[1], $rec[4])[$rec[1] > $rec[4]]; $end = ($rec[2], $rec[5])[$rec[2] < $rec[5]]; print "$rec[0]\t$start\t$end\t$rec[6]\t$rec[7]\t$rec[8]\n";}}' | awk -F "\t" '{if(($3-$2)<1000){print}}' > bam2bed/${out_prefix}.bed
-	cut -f 1,2,3,6 bam2bed/${out_prefix}.bed | sort -u | awk '{print $1"\t"$2"\t"$3"\t.\t.\t"$4}' > bam2bed/${out_prefix}.rmdup.bed
-	rm bam2bed/${out_prefix}.temp bam2bed/${out_prefix}.bam
-
-### 13-bed2peak.noFilter.sh
-
+### Step 4 (Integration sites calling)
+13-bed2peak.noFilter.sh
 The final step uses the bed files to find the location of viral integration site and generates a  report.  An window size parameter d (used as $d) is a window size to merge ends of reads.
-
-
 
     awk -F "\t" '{if($6=="+"){print $1"\t"$2"\t"$6} else {print $1"\t"$3"\t"$6}}' bam2bed/${out_prefix}.bed | 
     grep -v vector |
