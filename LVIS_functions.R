@@ -162,11 +162,12 @@ validate_coordinates <- function(all_P5_collected_IS){
 
 preprocess_all_VIS_collection<- function(all_P1_collected_IS){
 	#all_P1_collected_IS is the collection of output from the same patient
+	#the format here is to make sure the coordinate wouldn't be interpreted as a number..
 	all_IS_P1<-paste0(all_P1_collected_IS$seqnames,'.',format(all_P1_collected_IS$start,trim=TRUE,scientific=FALSE),'.',format(all_P1_collected_IS$end,trim=TRUE,scientific=FALSE),'.',all_P1_collected_IS$strand);
 	all_IS_P1_aux<-paste0(all_P1_collected_IS$seqnames,':',format(all_P1_collected_IS$start,trim=TRUE,scientific=FALSE),'-',format(all_P1_collected_IS$end,trim=TRUE,scientific=FALSE));
 	
 	#20152
-	u_all_IS_P1<-unique(all_IS_P1);
+	u_all_IS_P1<-unique(all_IS_P1);#strand specific...
 	u_all_IS_P1<-read.table(text = u_all_IS_P1, sep = ".");
 	library(bedr);
 	x<-paste0(u_all_IS_P1[,1],":",u_all_IS_P1[,2],'-',u_all_IS_P1[,3]);
@@ -209,6 +210,10 @@ merge_all_preprocessed_VIS_collection <-function(u_all_IS_P1){
 	#currently, we use d=0 in avoid VIS sites getting too big
 	#the Lance pipeline tested for d=5,6,7,8 to merge in in the raw read level
 	#it is different from here..
+	#-s, enforcing strandedness...
+	#sum for 5th col -> count how many sites are merged
+	#distict for column 6, as -s are used, it's not possible to merge sites in opposite strands together
+	#collapse for column 4...put index in delimited table..
 	u_all_IS_P1.merge<-bedr(
 		engine = "bedtools", 
      	input = list(i = u_all_IS_P1), 
