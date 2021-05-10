@@ -20,5 +20,7 @@ do
 	if [ ! -e bwa/$bwa_out ]; then 
 	#bwa mem -t 4 bwa_index/hg19_noHap.fa.gz newFastq/$fq_R1 newFastq/$fq_R2 | samtools view -hbS - > bwa/$bwa_out
 	bwa mem -t 4 $idx newFastq/$fq_R1 newFastq/$fq_R2 | samtools view -hbS - > bwa/$bwa_out
+	samtools sort bwa/$bwa_out bwa/$bwa_out\.sorted
+	samtools index bwa/$bwa_out\.sorted.bam bwa/$bwa_out\.sorted.bam\.bai
 	fi
 done
