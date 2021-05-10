@@ -9,7 +9,7 @@
 #BSUB -o output.%J     # output file name in which %J is replaced by the job ID
 
 module load bwa
-module load samtools
+module load samtools/1.10
 idx=/research/projects/yu3grp/IO_JY/yu3grp/LVXSCID/patients_scATACseq/bwa_index/hg19/hg19idx
 
 if [ ! -d bwa ]; then mkdir bwa; fi 
