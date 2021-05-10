@@ -12,73 +12,8 @@ Trimmed reads are aligned to the reference genome using the script [10-bwa.sh](h
 The script [11-bam2bed.sh](https://github.com/jyyulab/LVIS_pipeline/blob/master/qsLAM_PCR/11-bam2bed.sh) is used for filtering singleton reads, pairs mapped on different chromosomes, pairs with insertion size >1000bp using bedtools [bamtobed](https://bedtools.readthedocs.io/en/latest/content/tools/bamtobed.html). The reads (and genomic coordinates) are stored in bed files, including one for all reads and one for reads with duplicates (same start and end locations) removed. An optional script [12-bed2wig.sh](https://github.com/jyyulab/LVIS_pipeline/blob/master/qsLAM_PCR/12-bed2wig.sh) can be used to convert the bed file to bedgraph and bigwig files.
 
 ### Step 4 (Integration sites calling)
-The genomic starting coordinate of a read corresponds to the location of a vector integration site. After filtering of duplicated reads, the number of reads sharing the same integration sites are essentially originated from different cells. Counting the number of such reads measures the abundance of a clone. Due to a resolution limit of the assay, two vector integration sites (in the same strand) very close together are considered to be identical. This procedure is carried out by bedtools with an window size parameter d, using the script [13-bed2peak.noFilter.sh](https://github.com/jyyulab/LVIS_pipeline/blob/master/qsLAM_PCR/13-bed2peak.noFilter.sh). 
+The genomic starting coordinate of a read corresponds to the location of a vector integration site. After filtering of duplicated reads, the number of reads sharing the same integration sites are essentially originated from different cells. Counting the number of such reads measures the abundance of a clone. Due to a resolution limit of the assay, two vector integration sites (in the same strand) very close together are considered to be identical. This procedure is carried out by bedtools with an window size parameter d, using the script [13-bed2peak.noFilter.sh](https://github.com/jyyulab/LVIS_pipeline/blob/master/qsLAM_PCR/13-bed2peak.noFilter.sh). After arriving at a set of integration sites, apart from the number of unique reads, the total number of reads (including duplicates) starting from a site is also counted. The two counts nUniqueReads and nReads serve as two measures of clonal abundance.  
 
-
-    awk -F "\t" '{if($6=="+"){print $1"\t"$2"\t"$6} else {print $1"\t"$3"\t"$6}}' bam2bed/${out_prefix}.bed | 
-    grep -v vector |
-    sort |
-    uniq -c |
-    awk '{print $2"\t"$3"\t"$3+1"\t.\t"$1"\t"$4}' |
-    sort -k1,1 -k2,2n |
-    bedtools merge -c 5 -s -o sum -d $d -i - |
-    awk '{print $1"\t"$2"\t"$3"\t.\t"$5"\t"$4}' | 
-    grep -v vector |
-    bedtools intersect -b <(grep -v vector bam2bed/${out_prefix%.rmdup}.bed|
-    awk '{if($6=="+"){print $1"\t"$2"\t"$2+1"\t.\t.\t"$6} else {print $1"\t"$3"\t"$3+1"\t.\t.\t"$6}}') -c -s -a - | \
-    awk '{print $1"\t"$2"\t"$3"\t""'$out_prefix'""\t"$5"\t"$6"\t"$7}' > bed2peak_${d}/${out_prefix}.peak.merge.xls
-
-Breaking this up:
-
-
-
-The first step of the line, prints the chromosome, and fist position (0 based) of the match if forward strand and end position (1 based) if not on forward strand.  (why 0 or 1 based?)
-    awk -F "\t" '{if($6=="+"){print $1"\t"$2"\t"$6} else {print $1"\t"$3"\t"$6}}' bam2bed/${out_prefix}.bed 
-
-Any sequence match vector is removed.   (But this is not in bwa index?)
-    grep -v vector
-
-
-
-Sequences are sorted and duplicate line are removed (with their counts retained as first column).  
-    sort | uniq -c
-
-
-
-This is then converted back to a bed file (containing the first position of reads).  
-
-    awk '{print $2"\t"$3"\t"$3+1"\t.\t"$1"\t"$4}'
-
-Sort by chromosome and position
-     sort -k1,1 -k2,2n 
-
-
-Bedtools merge is usede to merge positions within N bases ($d) in line above.  And the number of counts is retained) 
-    bedtools merge -c 5 -s -o sum -d $d -i -
-    
-
-
-
-Revert this back to a bed format.
-    awk '{print $1"\t"$2"\t"$3"\t.\t"$5"\t"$4}' 
-  
-
-Remove lines with vector (why again)
-
-    grep -v vector
-
-
- Intersect these positions with the original bed file??
-      bedtools intersect -b <(grep -v vector bam2bed/${out_prefix%.rmdup}.bed|
-
-
-
----
-In the next step the bedtools window program is used to identify any control sites.  the window size is identified as $d .  the -sm parameter signals to use reads from same strand.
-
-    bedtools window -w $d -a bed2peak_${d}/${out_prefix}.peak.merge.xls -b known20sites.bed -sm -c > bed2peak_${d}/${out_prefix}.2.xls 
-
----
 ### Step 5 (Annotate the vector integration sites)
 The script [14-peakAnnotate.sh](https://github.com/jyyulab/LVIS_pipeline/blob/master/qsLAM_PCR/14-peakAnnotate.sh) is used to annotate the integration sites like the nearest genes, distance to TSS. Two excel files are generated in the output folder bed2peak_output_d as the final output for each set of FASTQ sequences.  One is the complete list of results, while the other is the top 20.
 
