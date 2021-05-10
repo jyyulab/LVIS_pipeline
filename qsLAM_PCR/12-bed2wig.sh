@@ -9,7 +9,7 @@
 #BSUB -o output.%J     # output file name in which %J is replaced by the job ID
 
 
-module load bedtools
+module load bedtools/v2.25.0
 
 if [ ! -d bed2wig ]; then mkdir bed2wig; fi
 for i in `ls -1 bam2bed | grep -P ".rmdup.bed$"`

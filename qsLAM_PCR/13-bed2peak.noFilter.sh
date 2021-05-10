@@ -8,9 +8,7 @@
 #BSUB -e errors.%J     # error file name in which %J is replaced by the job ID
 #BSUB -o output.%J     # output file name in which %J is replaced by the job ID
 
-
-module load bedtools
-#module load R/3.5.1
+module load bedtools/v2.25.0
 
 for d in 8
 do

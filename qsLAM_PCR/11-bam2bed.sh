@@ -8,7 +8,7 @@
 #BSUB -e errors.%J     # error file name in which %J is replaced by the job ID
 #BSUB -o output.%J     # output file name in which %J is replaced by the job ID
 
-
+module load samtools/1.2
 module load bedtools/2.25.0
 
 if [ ! -d bam2bed ]; then mkdir bam2bed; fi
