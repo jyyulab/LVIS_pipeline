@@ -44,7 +44,7 @@ See the steps-by-steps [instructions](https://github.com/jyyulab/LVIS_pipeline/b
   * [bedtools 2.29.0]
 
 ### Usage
-Useful functions are implemented in LVIS_functions.R. See the steps-by-steps [instruction](https://github.com/jyyulab/LVIS_pipeline/edit/master/more_vis_analysis.md) for the compilation of VISs across samples. 
+Useful functions are implemented in LVIS_functions.R. See examples and steps-by-steps [instructions](https://github.com/jyyulab/LVIS_pipeline/edit/master/more_vis_analysis.md) for the compilation of VISs across samples and other downstream analysis.
 
 ```R
 $ source("LVIS_functions.R")
