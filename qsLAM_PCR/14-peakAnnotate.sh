@@ -12,7 +12,7 @@
 module load bedtools/2.25.0
 module load R/3.5.1
 
-for d in 8
+for d in `seq 0 10`
 do
 for i in `ls -1 bam2bed | grep rmdup.bed`
 do
