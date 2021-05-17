@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 #BSUB -P insertionSite         # project code
-#BSUB -J bed2peak      # job name
+#BSUB -J peakAnnotate      # job name
 #BSUB -W 10:00                # wall-clock time (hrs:mins)
 #BSUB -n 1      # number of cpu
 #BSUB -R "rusage[mem=8000]"     # memory to reserve, in MB
@@ -51,7 +51,7 @@ inputBed[["percent"]] <- round(100*inputBed[["percent"]], 2)
 inputBed[["percentAllReads"]] <- inputBed[,"nReads"] / sum(inputBed[,"nReads"])
 inputBed[["percentAllReads"]] <- round(100*inputBed[["percentAllReads"]], 2)
 
-write.xlsx(inputBed, file="bed2peak_output_${d}/${out_prefix}.peak.merge.xlsx")
+write.xlsx(inputBed, file="bed2peak_${d}/${out_prefix}.peak.merge.xlsx")
 
 #we don't do spike
 #inputBed <- subset(inputBed, nOverlapWithSpike == 0)
