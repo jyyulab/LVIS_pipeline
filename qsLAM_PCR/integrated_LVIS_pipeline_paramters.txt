@@ -1,0 +1,11 @@
+inputFASTQ	./rawdata
+adapter1	ATCCCTCAGACCCTTTTAGTCAGTGTGGAAAATCTC
+ignoreThis	TAGCA
+adapter2	GACTGCGTATCAGT
+cutadaptErrorRate	0.1
+bwaIndex	/research/projects/yu3grp/IO_JY/yu3grp/LVXSCID/patients_scATACseq/bwa_index/hg19/hg19idx
+overlapDistances	8
+bsubQueue	compbio
+scratch	/scratch_space/kyan/vis_aux
+knownSites	./known20sites.bed
+inputDataDir	./rawdata
