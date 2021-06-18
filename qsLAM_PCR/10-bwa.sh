@@ -22,5 +22,6 @@ do
 	bwa mem -t 4 $idx newFastq/$fq_R1 newFastq/$fq_R2 | samtools view -hbS - > bwa/$bwa_out
 	samtools sort bwa/$bwa_out -o bwa/$bwa_out\.sorted
 	samtools index bwa/$bwa_out\.sorted bwa/$bwa_out\.sorted\.bai
+	samtools flagstat bwa/$bwa_out\.sorted > bwa/$bwa_out\.stat
 	fi
 done
