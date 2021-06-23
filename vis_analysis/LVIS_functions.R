@@ -326,6 +326,24 @@ generate_u_VIS_merge_samples_matrix_unique <- function(X){
 
 }
 
+filter_vis<-function(counts_nR_IS_expts,remove){
+	all_expts<-colnames(counts_nR_IS_expts);
+	counts_nR_IS_expts_filter<-counts_nR_IS_expts;
+	for (e in all_expts){
+		x<-counts_nR_IS_expts[,e];
+		r<-sort(as.vector(x[x>0]));
+		cdf<-cumsum(r)/sum(r);
+		aux<-c(0,diff(r));
+		i_pick<-which((cdf>remove)&(aux>0))[1];
+		cut<-r[i_pick];
+		x[x<cut]<-0;
+		counts_nR_IS_expts_filter[,e]<-x;
+	}
+	return(counts_nR_IS_expts_filter);
+}
+
+
+
 
 prepare_venn_diagram_samples <- function(counts_IS_expts,pick_samples){
 	aux<-list();
