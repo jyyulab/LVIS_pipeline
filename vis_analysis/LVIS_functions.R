@@ -39,7 +39,7 @@ get_top20_composition_and_nVIS_all_samples <- function(all_P1_collected_IS_renam
 
 get_samples_diversity_measures <- function(tmp){
 
-	rr<-tmp$nReads;
+	rr<-tmp;
 	y<-rr[rr>0];
 	y<-as.numeric(cumsum(sort(y)));
 	y<-c(0,y/y[length(y)]);
@@ -71,14 +71,13 @@ get_samples_diversity_measures <- function(tmp){
 	return(res);
 }
 
-get_diversity_measures_all_samples <- function(all_P1_collected_IS_rename){
-	print('remember to get rid of the VISs with spike');
-	all_expts<-unique(all_P1_collected_IS_rename$sample_ori);
+get_diversity_measures_all_samples <- function(counts_nR_IS_expts_Filter){
+	all_expts<-colnames(counts_nR_IS_expts_Filter);
 	diversity_vs_expts<-matrix(0,4,length(all_expts));
 	colnames(diversity_vs_expts)<-all_expts;
 	rownames(diversity_vs_expts)<-c('sample_OCI','sample_entropy','sample_Chao','sample_UC50');
 	for (e in all_expts){
-		tmp<-all_P1_collected_IS_rename[which(all_P1_collected_IS_rename$sample_ori==e),];
+		tmp<-counts_nR_IS_expts_Filter[,e];
 		out<-get_samples_diversity_measures(tmp);
 		diversity_vs_expts[1,e]<-out[['sample_OCI']];
 		diversity_vs_expts[2,e]<-out[['sample_entropy']];
@@ -344,7 +343,7 @@ filter_vis<-function(counts_nR_IS_expts,remove){
 
 
 
-
+##since counts_IS_expts are compiled in a strand-specific way, the venn here is strand-specific
 prepare_venn_diagram_samples <- function(counts_IS_expts,pick_samples){
 	aux<-list();
 	for (i in 1:length(pick_samples)){
