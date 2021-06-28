@@ -434,17 +434,17 @@ draw_circos<-function(VIS_list,win_size,bed){
 
 	circos.par(gap.after=gap);
 	circos.initializeWithIdeogram(plotType = NULL);
-	#circos.genomicLabels(bed, labels.column = 4, side = "outside", cex=0.5,
-    #	col = as.numeric(factor(bed[[1]])), line_col = as.numeric(factor(bed[[1]])))
 	circos.genomicIdeogram()
-
+	
 	n<-length(VIS_list);
 	track_names<-names(VIS_list);
 	for (i in 1:n){
 		circos.genomicDensity(VIS_list[[i]], col = c("#600000"), track.height = 0.1,window.size=win_size,ylim.force = FALSE);
 		#circos.text(sector.index="chr1",track.index = 2*i,get.cell.meta.data("cell.xlim")-mean(get.cell.meta.data("cell.xlim"))/2,
-        #    get.cell.meta.data("cell.ylim"), labels = track_names[i],facing = "clockwise", niceFacing = TRUE, adj = c(0,0),cex=0.5)
+            #get.cell.meta.data("cell.ylim"), labels = track_names[i],facing = "clockwise", niceFacing = TRUE, adj = c(0,0),cex=0.5)
 	}
+	circos.genomicLabels(bed, labels.column = 4, side = "inside", labels.side="inside",cex=1,
+	                     col = as.numeric(factor(bed[[1]])), line_col = as.numeric(factor(bed[[1]])))
 	circos.clear();
 }
 
