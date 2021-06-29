@@ -543,11 +543,11 @@ get_geneFreq <- function(u_VIS_merge_homer_annot_modify){
 	return(geneFreq);
 }
 
-generate_GeneCloud <- function(geneFreq,out_file){
-	#library(tagcloud);
-	#let's just take the top genes cover 25% lof all VIS..
+generate_GeneCloud <- function(geneFreq,display_cumsum,all_max,out_file){
 	library(wordcloud)
 	set.seed(1234) # for reproducibility 
+	#display_cumsum<-.25;#the cum sum that the top genes reach
+	#all_max<-261;#261 is the max of P2, i.e. max of all patients..
 	df <- data.frame(gene = names(geneFreq),freq=geneFreq);
 	df<-df[,c(1,3)];
 	colnames(df)<-c("gene","freq");
@@ -555,14 +555,13 @@ generate_GeneCloud <- function(geneFreq,out_file){
 	cf<-cumsum(df$freq)/sum(df$freq);
 	df2<-df[1:which(cf>.25)[1],];
 	top_n_gene<-dim(df2)[1];
-	minf<-df[top_n_gene,2]-1;
+	minf<-max(df[top_n_gene,2]-1,1);#avoid minf=0
 	max_font<-df2[1,2]/sum(df$freq);
-	max_font<-round(max_font*500,1);
+	max_font<-round(max_font*scale_factor,2);
 	min_font<-df2[top_n_gene,2]/sum(df$freq);
-	min_font<-round(min_font*500,1);
+	min_font<-round(min_font*scale_factor,2);
 	dev.new(width=5, height=5, unit="in")
 	wordcloud(words = df2$gene, freq = df2$freq,min.freq=minf,max.words=top_n_gene, random.order=FALSE,rot.per=0,fixed.asp=TRUE,colors=brewer.pal(8, "Dark2"),scale=c(max_font,min_font))
-	#tagcloud(names(geneFreq),geneFreq,col="red",sel=1:top_n_gene,algorithm= "oval");
 	dev.copy2pdf(file=out_file, out.type= "cairo" );
 }
 
