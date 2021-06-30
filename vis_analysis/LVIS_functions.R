@@ -597,7 +597,7 @@ get_hotspots_thres<-function(X,nVIS){
 	genome_size=3.235e9;
 	n<-genome_size/window;
 	lambda<-nVIS/n;
-	count=X$pct*window;
+	count=X$value*window;
 	all_Pvalue<-1-ppois(count,lambda);
 	X$P<-all_Pvalue;
 	X$P_Bonferroni<-X$P*dim(X)[1];
