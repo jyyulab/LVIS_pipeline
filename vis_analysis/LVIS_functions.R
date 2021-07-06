@@ -531,8 +531,9 @@ simplify_homer_annotation <- function(u_VIS_merge_homer_annot,M){
 	x<-gsub("3' UTR","3_UTR",x);
 	x<-gsub("5' UTR","5_UTR",x);
 
-	X<-M[x,c(8,9)];
+	X<-M[x,c(8,9,5)];
 	u_VIS_merge_homer_annot_modify<-cbind(u_VIS_merge_homer_annot,X);
+	colnames(u_VIS_merge_homer_annot_modify)[22]<-"near.gene.strand";
 	return(u_VIS_merge_homer_annot_modify);
 }
 
