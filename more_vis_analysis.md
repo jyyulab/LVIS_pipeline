@@ -7,6 +7,6 @@ An example of input file:
 ![picture2](./img/sample_input.png)
 
 ### Outputs
-The pipeline.R script shows the the compilation of a final list of VISs. Based on the compiled list, a frequency matrix storing the total number of reads mapped to each of the integration sites across samples from different cell types and time points was constructed for quantifying clonal populations.
+The compile_vis.R script shows the the compilation of a final list of VISs. Based on the compiled list, a frequency matrix storing the total number of reads mapped to each of the integration sites across samples from different cell types and time points was constructed for quantifying clonal populations.
 
 To reduce false-positive results, only integration sites with at least two unique reads or at least five total reads were kept. The total number of reads mapped to a VIS was used to quantify the relative population of the corresponding clone. To compile a complete list of integration sites for a patient, integration sites across samples were matched. In short, overlapping integration sites (defined from the start position to the end position in the VIS calling output) from different samples were considered to be the same site, even though the procedure might potentially merge a few integration sites that were close to one another. 
