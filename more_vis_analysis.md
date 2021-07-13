@@ -12,4 +12,5 @@ A few files are included:
 * LVIS_functions.R (a list of functions called by other analysis scripts)
 * compile_VIS.R (a tutorial showing how to take the inputs and perform VIS integration across samples)
 * vis_visualization_examples.R (a tutorial showing how to use some of the visualization functions)
+* all_P4_collect_IS.Rdata (an example: vis outputed from the qsLAM pipeline for a patient)
 
