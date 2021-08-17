@@ -20,3 +20,9 @@ The script [14-peakAnnotate.sh](https://github.com/jyyulab/LVIS_pipeline/blob/ma
   
 ![image](https://user-images.githubusercontent.com/20668533/117071120-43894780-acf4-11eb-9b22-bc7000587fba.png)
 
+The steps above can be simplified by using the integrative script [integrated_LVIS_pipeline.sh](https://github.com/jyyulab/LVIS_pipeline/blob/master/qsLAM_PCR/integrated_LVIS_pipeline.sh). In a LSF cluster, it is done by
+
+```sh
+./LVIS_pipeline.sh LVIS_paramters.txt > LVIS_pipeline.out
+```
+
