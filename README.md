@@ -51,6 +51,5 @@ $ source("LVIS_functions.R")
 ```
 
 ## A classifier of integration sites by integrome signatures
-
-
+The code to build the catboost model for classifying high vs low abundance vis is in no_P1_classification.ipynb
 
